@@ -1,0 +1,17 @@
+pandas
+numpy
+requests
+yfinance
+praw
+textblob
+vaderSentiment
+transformers
+torch
+scikit-learn
+mlflow
+dvc
+fastapi
+uvicorn
+apache-airflow
+matplotlib
+seaborn
