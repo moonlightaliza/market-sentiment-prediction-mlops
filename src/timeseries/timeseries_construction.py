@@ -35,17 +35,18 @@ print("✅ All imports successful")
 # ─────────────────────────────────────────────────────────────────────────────
 #  ALL CONFIGURABLE SETTINGS LIVE HERE — change once, affects entire notebook
 # ─────────────────────────────────────────────────────────────────────────────
-
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 # Input file paths
-PRICE_CSV          = 'C:\\Users\\Z\\market-sentiment-prediction-mlops\\data\\raw\\yahoo_prices.csv'
-NEWS_CSV           = 'C:\\Users\\Z\\market-sentiment-prediction-mlops\\data\\sentiment_labeled\\news_sentiment.csv'
-REDDIT_CSV         = 'C:\\Users\\Z\\market-sentiment-prediction-mlops\\data\\sentiment_labeled\\reddit_sentiment.csv'
-TWITTER_CSV        = 'C:\\Users\\Z\\market-sentiment-prediction-mlops\\data\\sentiment_labeled\\twitter_sentiment.csv'
+PRICE_CSV          = os.path.join(BASE_DIR, 'data', 'raw', 'yahoo_prices.csv')
+NEWS_CSV           = os.path.join(BASE_DIR, 'data', 'sentiment_labeled', 'news_sentiment.csv')
+REDDIT_CSV         = os.path.join(BASE_DIR, 'data', 'sentiment_labeled', 'reddit_sentiment.csv')
+TWITTER_CSV        = os.path.join(BASE_DIR, 'data', 'sentiment_labeled', 'twitter_sentiment.csv')
+
 
 # Output paths
-OUTPUT_DIR         = 'C:\\Users\\Z\\market-sentiment-prediction-mlops\\data\\processed'
-OUTPUT_CSV         = f'{OUTPUT_DIR}/timeseries_dataset.csv'
-FEATURE_JSON       = f'{OUTPUT_DIR}/feature_columns.json'
+OUTPUT_DIR         = os.path.join(BASE_DIR, 'data', 'processed')
+OUTPUT_CSV         = os.path.join(OUTPUT_DIR, 'timeseries_dataset.csv')
+FEATURE_JSON       = os.path.join(OUTPUT_DIR, 'feature_columns.json')
 
 # Time-series parameters
 RESAMPLE_FREQ      = '15min'    # 15-minute windows (pandas >= 2.2 prefers '15min' over '15T')
@@ -1052,7 +1053,7 @@ if __name__ == "__main__":
 '''
 
 # Save main.py alongside this notebook
-with open('main.py', 'w') as f:
+with open('main.py', 'w',encoding='utf-8') as f:
     f.write(fastapi_code.strip())
 
 print("✅ main.py saved in current directory")
