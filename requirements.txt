@@ -2,11 +2,13 @@ pandas
 numpy
 requests
 yfinance
-praw
+feedparser
+snscrape
 textblob
 vaderSentiment
 transformers
 torch
+sentencepiece
 scikit-learn
 mlflow
 dvc
@@ -15,3 +17,5 @@ uvicorn
 apache-airflow
 matplotlib
 seaborn
+python-dotenv
+tqdm
