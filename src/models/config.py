@@ -23,23 +23,21 @@ CONFIG = {
         "volume"
     ],
     "target_column": "target",
-    "sequence_length": 10,       # 348 samples is small, keep seq short
+    "sequence_length": 5,        # reduced from 10
     "test_size": 0.2,
 
     # Model
     "input_size": 17,
-    "hidden_size": 64,
-    "num_layers": 2,
+    "hidden_size": 32,           # reduced from 64
+    "num_layers": 1,             # reduced from 2
     "output_size": 1,
-    "dropout": 0.2,
+    "dropout": 0.3,              # increased from 0.2
 
     # Training
     "epochs": 50,
-    "batch_size": 16,            # small dataset so small batch
+    "batch_size": 16,
     "learning_rate": 0.001,
-
-    # MLflow
-    "experiment_name": "market-sentiment-prediction",
+    "early_stopping_patience": 10,  # stop if val loss doesn't improve for 10 epochs
 
     # Paths
     "model_save_path": "src/models/saved_models/",

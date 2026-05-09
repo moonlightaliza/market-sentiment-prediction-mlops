@@ -11,7 +11,6 @@ from sklearn.preprocessing import StandardScaler
 from sklearn.model_selection import train_test_split
 from tqdm import tqdm
 
-# ── Make sure sibling modules are importable ────────────────────────────────
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 from config import CONFIG
 from rnn_model import RNNModel
@@ -55,7 +54,7 @@ def build_sequences(X, y, seq_len):
 
 
 # ════════════════════════════════════════════════════════════
-# 3 — TRAIN ONE MODEL
+# 3 — TRAIN ONE MODEL (with early stopping)
 # ════════════════════════════════════════════════════════════
 
 def train_model(model, model_name, train_loader, val_loader):
@@ -64,7 +63,11 @@ def train_model(model, model_name, train_loader, val_loader):
         model.parameters(), lr=CONFIG["learning_rate"]
     )
 
-    best_val_loss = float("inf")
+    best_val_loss    = float("inf")
+    patience         = CONFIG["early_stopping_patience"]
+    patience_counter = 0
+    stopped_epoch    = CONFIG["epochs"]
+
     os.makedirs(CONFIG["model_save_path"], exist_ok=True)
     save_path = os.path.join(CONFIG["model_save_path"], f"{model_name}_best.pt")
 
@@ -80,7 +83,7 @@ def train_model(model, model_name, train_loader, val_loader):
         for X_batch, y_batch in train_loader:
             optimizer.zero_grad()
             preds = model(X_batch).squeeze()
-            loss = criterion(preds, y_batch)
+            loss  = criterion(preds, y_batch)
             loss.backward()
             optimizer.step()
             train_loss += loss.item()
@@ -89,34 +92,44 @@ def train_model(model, model_name, train_loader, val_loader):
         # ── Validate ─────────────────────────────────────────
         model.eval()
         val_loss = 0.0
-        correct = 0
-        total = 0
+        correct  = 0
+        total    = 0
         with torch.no_grad():
             for X_batch, y_batch in val_loader:
-                preds = model(X_batch).squeeze()
-                loss = criterion(preds, y_batch)
+                preds     = model(X_batch).squeeze()
+                loss      = criterion(preds, y_batch)
                 val_loss += loss.item()
                 predicted = (torch.sigmoid(preds) >= 0.5).float()
-                correct += (predicted == y_batch).sum().item()
-                total += y_batch.size(0)
+                correct  += (predicted == y_batch).sum().item()
+                total    += y_batch.size(0)
 
         val_loss /= len(val_loader)
-        val_acc = correct / total * 100
+        val_acc   = correct / total * 100
 
         # ── Update progress bar ───────────────────────────────
         epoch_bar.set_postfix({
             "train_loss": f"{train_loss:.4f}",
             "val_loss":   f"{val_loss:.4f}",
-            "val_acc":    f"{val_acc:.1f}%"
+            "val_acc":    f"{val_acc:.1f}%",
+            "patience":   f"{patience_counter}/{patience}"
         })
 
-        # ── Save best model ───────────────────────────────────
+        # ── Save best & early stopping ────────────────────────
         if val_loss < best_val_loss:
-            best_val_loss = val_loss
+            best_val_loss    = val_loss
+            patience_counter = 0
             torch.save(model.state_dict(), save_path)
+        else:
+            patience_counter += 1
+            if patience_counter >= patience:
+                stopped_epoch = epoch + 1
+                epoch_bar.close()
+                print(f"  ⏹  Early stopping at epoch {stopped_epoch} "
+                      f"(no improvement for {patience} epochs)")
+                break
 
     print(f"  ✅ Best val loss: {best_val_loss:.4f} → saved to {save_path}")
-    return best_val_loss
+    return best_val_loss, stopped_epoch
 
 
 # ════════════════════════════════════════════════════════════
@@ -170,17 +183,18 @@ def main():
 
     results = {}
     for name, model in models.items():
-        best_loss = train_model(model, name, train_loader, val_loader)
-        results[name] = best_loss
+        best_loss, stopped_at = train_model(model, name, train_loader, val_loader)
+        results[name] = {"loss": best_loss, "stopped_at": stopped_at}
 
     # ── Summary ───────────────────────────────────────────────
-    print("\n" + "=" * 50)
+    print("\n" + "=" * 55)
     print("  TRAINING SUMMARY")
-    print("=" * 50)
-    best_model = min(results, key=results.get)
-    for name, loss in results.items():
+    print("=" * 55)
+    best_model = min(results, key=lambda k: results[k]["loss"])
+    for name, info in results.items():
         tag = " ← best" if name == best_model else ""
-        print(f"  {name:<6}: best val loss = {loss:.4f}{tag}")
+        print(f"  {name:<6}: val loss = {info['loss']:.4f} "
+              f"| stopped at epoch {info['stopped_at']}{tag}")
     print(f"\n🏆 Best model: {best_model}")
     print(f"✅ All models saved to {CONFIG['model_save_path']}")
 
