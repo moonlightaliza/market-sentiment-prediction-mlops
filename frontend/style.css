@@ -1,0 +1,564 @@
+/* ============================================================
+   style.css — MarketPulse Sentiment Predictor
+   Sections:
+     1. Reset & Variables
+     2. Base / Body
+     3. Navigation
+     4. Layout
+     5. Hero
+     6. Input Card
+     7. Tabs
+     8. Form Elements
+     9. Analyze Button & Spinner
+    10. Result Card
+    11. Gauge & Breakdown Bars
+    12. Sample Prompts
+    13. Footer
+    14. Animations
+   ============================================================ */
+
+
+/* ── 1. Reset & Variables ─────────────────────────────────── */
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+:root {
+  --bg:        #0c0f14;
+  --surface:   #131820;
+  --card:      #181e28;
+  --border:    #252d3d;
+  --border2:   #2e3a50;
+  --text:      #e8edf5;
+  --muted:     #6b7a94;
+  --dim:       #3d4d63;
+
+  --amber:     #f0a034;
+  --amber-dim: #7a4f10;
+  --teal:      #2ecf9a;
+  --teal-dim:  #0e5c40;
+  --red:       #f05c5c;
+  --red-dim:   #5c1e1e;
+
+  --mono: 'Space Mono', monospace;
+  --sans: 'DM Sans', sans-serif;
+}
+
+
+/* ── 2. Base / Body ───────────────────────────────────────── */
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--sans);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+
+/* ── 3. Navigation ────────────────────────────────────────── */
+
+nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1.1rem 2.5rem;
+  border-bottom: 1px solid var(--border);
+  position: sticky;
+  top: 0;
+  background: rgba(12, 15, 20, 0.92);
+  backdrop-filter: blur(12px);
+  z-index: 10;
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-family: var(--mono);
+  font-size: 0.9rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  color: var(--text);
+  text-decoration: none;
+}
+
+.logo-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--teal);
+  box-shadow: 0 0 8px var(--teal);
+  animation: pulse-dot 2.4s ease-in-out infinite;
+}
+
+.nav-tag {
+  font-family: var(--mono);
+  font-size: 0.7rem;
+  padding: 4px 10px;
+  border: 1px solid var(--border2);
+  border-radius: 4px;
+  color: var(--muted);
+  letter-spacing: 0.06em;
+}
+
+
+/* ── 4. Layout ────────────────────────────────────────────── */
+
+main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 4rem 1.5rem 6rem;
+}
+
+
+/* ── 5. Hero ──────────────────────────────────────────────── */
+
+.hero {
+  text-align: center;
+  margin-bottom: 3.5rem;
+  animation: fade-up 0.6s ease both;
+}
+
+.hero-eyebrow {
+  font-family: var(--mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.14em;
+  color: var(--teal);
+  text-transform: uppercase;
+  margin-bottom: 1rem;
+}
+
+h1 {
+  font-family: var(--sans);
+  font-size: clamp(1.9rem, 4vw, 3rem);
+  font-weight: 300;
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+  color: var(--text);
+  margin-bottom: 1rem;
+}
+
+h1 strong {
+  font-weight: 600;
+  background: linear-gradient(90deg, #f0a034, #2ecf9a);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.hero-sub {
+  color: var(--muted);
+  font-size: 0.95rem;
+  font-weight: 300;
+  max-width: 420px;
+  margin: 0 auto;
+  line-height: 1.6;
+}
+
+
+/* ── 6. Input Card ────────────────────────────────────────── */
+
+.input-card {
+  width: 100%;
+  max-width: 680px;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 2rem;
+  animation: fade-up 0.6s 0.1s ease both;
+}
+
+
+/* ── 7. Tabs ──────────────────────────────────────────────── */
+
+.tabs {
+  display: flex;
+  gap: 4px;
+  background: var(--surface);
+  border-radius: 8px;
+  padding: 4px;
+  margin-bottom: 1.5rem;
+}
+
+.tab {
+  flex: 1;
+  padding: 7px 12px;
+  font-size: 0.8rem;
+  font-family: var(--sans);
+  font-weight: 500;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  background: transparent;
+  color: var(--muted);
+  transition: all 0.2s;
+  letter-spacing: 0.01em;
+}
+
+.tab.active {
+  background: var(--border2);
+  color: var(--text);
+}
+
+.tab:hover:not(.active) {
+  color: var(--text);
+}
+
+.panel {
+  display: none;
+}
+
+.panel.active {
+  display: block;
+}
+
+
+/* ── 8. Form Elements ─────────────────────────────────────── */
+
+label.field-label {
+  display: block;
+  font-family: var(--mono);
+  font-size: 0.68rem;
+  letter-spacing: 0.1em;
+  color: var(--muted);
+  text-transform: uppercase;
+  margin-bottom: 0.5rem;
+}
+
+textarea,
+input[type="text"] {
+  width: 100%;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  color: var(--text);
+  font-family: var(--sans);
+  font-size: 0.92rem;
+  font-weight: 300;
+  line-height: 1.6;
+  padding: 0.85rem 1rem;
+  resize: vertical;
+  transition: border-color 0.2s;
+  outline: none;
+}
+
+textarea {
+  min-height: 110px;
+}
+
+textarea:focus,
+input[type="text"]:focus {
+  border-color: var(--border2);
+}
+
+textarea::placeholder,
+input::placeholder {
+  color: var(--dim);
+}
+
+.ticker-row {
+  display: flex;
+  gap: 10px;
+}
+
+.ticker-row input {
+  flex: 1;
+  font-family: var(--mono);
+  letter-spacing: 0.08em;
+}
+
+.field-hint {
+  font-size: 0.75rem;
+  color: var(--dim);
+  margin-top: 0.4rem;
+}
+
+
+/* ── 9. Analyze Button & Spinner ──────────────────────────── */
+
+.btn-analyze {
+  width: 100%;
+  margin-top: 1.5rem;
+  padding: 0.9rem;
+  background: var(--amber);
+  color: #0c0f14;
+  font-family: var(--sans);
+  font-size: 0.9rem;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: opacity 0.2s, transform 0.1s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.btn-analyze:hover   { opacity: 0.88; }
+.btn-analyze:active  { transform: scale(0.98); }
+.btn-analyze:disabled { opacity: 0.4; cursor: not-allowed; }
+
+.btn-analyze svg {
+  width: 16px;
+  height: 16px;
+}
+
+.spinner {
+  width: 15px;
+  height: 15px;
+  border: 2px solid rgba(12, 15, 20, 0.3);
+  border-top-color: #0c0f14;
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+}
+
+
+/* ── 10. Result Card ──────────────────────────────────────── */
+
+#result {
+  width: 100%;
+  max-width: 680px;
+  margin-top: 1.5rem;
+  animation: fade-up 0.4s ease both;
+}
+
+#result.hidden {
+  display: none;
+}
+
+.result-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  overflow: hidden;
+}
+
+.result-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1.25rem 1.75rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.result-label-group {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.sentiment-badge {
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  padding: 4px 12px;
+  border-radius: 6px;
+}
+
+.badge-bullish { background: var(--teal-dim); color: var(--teal); }
+.badge-bearish { background: var(--red-dim);  color: var(--red);  }
+.badge-neutral { background: var(--amber-dim);color: var(--amber);}
+
+.result-title {
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: var(--text);
+}
+
+.result-score-text {
+  font-family: var(--mono);
+  font-size: 1.6rem;
+  font-weight: 700;
+}
+
+.score-bullish { color: var(--teal); }
+.score-bearish { color: var(--red);  }
+.score-neutral { color: var(--amber);}
+
+.result-body {
+  padding: 1.25rem 1.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.result-summary {
+  background: var(--surface);
+  border-radius: 10px;
+  padding: 1rem 1.2rem;
+  font-size: 0.85rem;
+  color: var(--muted);
+  line-height: 1.65;
+  font-style: italic;
+  border-left: 2px solid var(--border2);
+}
+
+.result-summary span {
+  color: var(--text);
+  font-style: normal;
+}
+
+.result-meta {
+  display: flex;
+  justify-content: space-between;
+  font-family: var(--mono);
+  font-size: 0.65rem;
+  color: var(--dim);
+  letter-spacing: 0.06em;
+  padding: 0.75rem 1.75rem;
+  border-top: 1px solid var(--border);
+}
+
+
+/* ── 11. Gauge & Breakdown Bars ───────────────────────────── */
+
+.gauge-label {
+  display: flex;
+  justify-content: space-between;
+  font-family: var(--mono);
+  font-size: 0.68rem;
+  color: var(--muted);
+  letter-spacing: 0.06em;
+  margin-bottom: 6px;
+}
+
+.gauge-track {
+  width: 100%;
+  height: 6px;
+  background: var(--surface);
+  border-radius: 3px;
+  position: relative;
+}
+
+.gauge-fill {
+  height: 100%;
+  border-radius: 3px;
+  transition: width 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.fill-bullish { background: var(--teal); }
+.fill-bearish { background: var(--red);  }
+.fill-neutral { background: var(--amber);}
+
+.breakdown {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.breakdown-row {
+  display: grid;
+  grid-template-columns: 80px 1fr 42px;
+  align-items: center;
+  gap: 10px;
+}
+
+.breakdown-key {
+  font-family: var(--mono);
+  font-size: 0.7rem;
+  color: var(--muted);
+  letter-spacing: 0.06em;
+}
+
+.mini-track {
+  background: var(--surface);
+  border-radius: 3px;
+  height: 4px;
+  overflow: hidden;
+}
+
+.mini-fill {
+  height: 100%;
+  border-radius: 3px;
+  transition: width 0.8s 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.breakdown-val {
+  font-family: var(--mono);
+  font-size: 0.7rem;
+  text-align: right;
+}
+
+
+/* ── 12. Sample Prompts ───────────────────────────────────── */
+
+.samples-section {
+  width: 100%;
+  max-width: 680px;
+  margin-top: 2rem;
+  animation: fade-up 0.6s 0.2s ease both;
+}
+
+.samples-label {
+  font-family: var(--mono);
+  font-size: 0.65rem;
+  letter-spacing: 0.1em;
+  color: var(--dim);
+  text-transform: uppercase;
+  margin-bottom: 0.75rem;
+}
+
+.samples-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.sample-chip {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 0.65rem 1rem;
+  font-size: 0.82rem;
+  color: var(--muted);
+  cursor: pointer;
+  transition: all 0.15s;
+  line-height: 1.4;
+}
+
+.sample-chip:hover {
+  border-color: var(--border2);
+  color: var(--text);
+  background: var(--card);
+}
+
+
+/* ── 13. Footer ───────────────────────────────────────────── */
+
+footer {
+  text-align: center;
+  padding: 1.5rem;
+  border-top: 1px solid var(--border);
+  font-family: var(--mono);
+  font-size: 0.65rem;
+  color: var(--dim);
+  letter-spacing: 0.06em;
+}
+
+
+/* ── 14. Animations ───────────────────────────────────────── */
+
+@keyframes fade-up {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes pulse-dot {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50%       { opacity: 0.5; transform: scale(0.7); }
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}

@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MarketPulse — Sentiment Predictor</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <!-- ─── NAVIGATION ─── -->
+  <nav>
+    <a class="logo" href="#">
+      <div class="logo-dot"></div>
+      MARKETPULSE
+    </a>
+    <span class="nav-tag">v1.0 · MLOps</span>
+  </nav>
+
+  <!-- ─── PAGE CONTENT ─── -->
+  <main>
+
+    <!-- Hero -->
+    <div class="hero">
+      <p class="hero-eyebrow">AI-Powered Analysis</p>
+      <h1>Market <strong>Sentiment</strong><br/>Prediction</h1>
+      <p class="hero-sub">
+        Paste a financial headline or enter a ticker to instantly
+        classify market sentiment using our trained ML model.
+      </p>
+    </div>
+
+    <!-- Input Card -->
+    <div class="input-card">
+
+      <!-- Tab switcher -->
+      <div class="tabs">
+        <button class="tab active" onclick="switchTab('text', this)">News / Headline</button>
+        <button class="tab"        onclick="switchTab('ticker', this)">Ticker Symbol</button>
+      </div>
+
+      <!-- Text panel -->
+      <div id="panel-text" class="panel active">
+        <label class="field-label">Input text</label>
+        <textarea
+          id="news-input"
+          placeholder="e.g. Federal Reserve signals potential rate cuts as inflation eases toward 2% target…"
+        ></textarea>
+        <p class="field-hint">Paste a news headline, article excerpt, or earnings note.</p>
+      </div>
+
+      <!-- Ticker panel -->
+      <div id="panel-ticker" class="panel">
+        <label class="field-label">Ticker symbol</label>
+        <div class="ticker-row">
+          <input type="text" id="ticker-input" placeholder="AAPL, TSLA, BTC-USD…" maxlength="12" />
+        </div>
+        <p class="field-hint">Fetches recent news and computes aggregated sentiment.</p>
+      </div>
+
+      <!-- Submit -->
+      <button class="btn-analyze" id="analyze-btn" onclick="runAnalysis()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/>
+        </svg>
+        Analyze Sentiment
+      </button>
+
+    </div>
+
+    <!-- Result (populated by JS) -->
+    <div id="result" class="hidden"></div>
+
+    <!-- Sample prompts -->
+    <div class="samples-section" id="samples">
+      <p class="samples-label">Try an example</p>
+      <div class="samples-list">
+        <div class="sample-chip" onclick="useSample(this)">Fed signals no rush to cut rates as labour market stays resilient</div>
+        <div class="sample-chip" onclick="useSample(this)">Apple beats Q3 earnings expectations with record services revenue</div>
+        <div class="sample-chip" onclick="useSample(this)">Banking sector faces uncertainty as credit defaults rise in Q2</div>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- ─── FOOTER ─── -->
+  <footer>MARKET-SENTIMENT-PREDICTION-MLOPS · FRONTEND UI · CONNECT TO /api/predict</footer>
+
+  <script src="main.js"></script>
+</body>
+</html>
