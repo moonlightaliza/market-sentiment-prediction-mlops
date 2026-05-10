@@ -32,7 +32,7 @@ RUN pip install --no-cache-dir -r api_requirements.txt
 COPY api/                  ./api/
 COPY src/models/           ./src/models/
 COPY src/timeseries/       ./src/timeseries/
-COPY data/processed/       ./data/processed/
+
 
 # ── Expose port ───────────────────────────────────────────────────
 EXPOSE 8000
