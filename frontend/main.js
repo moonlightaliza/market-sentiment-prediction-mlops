@@ -1,25 +1,38 @@
 /* ============================================================
    main.js — MarketPulse Sentiment Predictor
    Sections:
-     1. State
-     2. Tab Switching
-     3. Sample Prompts
-     4. Input Helpers
-     5. Main Analysis Flow
-     6. API Call  ← replace mock with real endpoint here
-     7. Mock Predictor (remove after API is connected)
+     1. Config
+     2. State
+     3. Tab Switching
+     4. Sample Prompts
+     5. Input Helpers
+     6. Main Analysis Flow
+     7. API Call
      8. Render: Result Card
      9. Render: Error
     10. Keyboard Shortcut
    ============================================================ */
 
 
-/* ── 1. State ─────────────────────────────────────────────── */
+/* ── 1. Config ────────────────────────────────────────────── */
+/*
+   BACKEND_URL is injected by index.html via window.BACKEND_URL.
+
+   Development (FastAPI serves the frontend — same origin):
+     window.BACKEND_URL = '';          ← no CORS needed
+
+   After deploying to Railway / Render / etc., set in index.html:
+     window.BACKEND_URL = 'https://marketpulse.up.railway.app';
+*/
+const BACKEND_URL = window.BACKEND_URL ?? '';
+
+
+/* ── 2. State ─────────────────────────────────────────────── */
 
 let activeTab = 'text';
 
 
-/* ── 2. Tab Switching ─────────────────────────────────────── */
+/* ── 3. Tab Switching ─────────────────────────────────────── */
 
 function switchTab(tab, el) {
   activeTab = tab;
@@ -34,17 +47,16 @@ function switchTab(tab, el) {
 }
 
 
-/* ── 3. Sample Prompts ────────────────────────────────────── */
+/* ── 4. Sample Prompts ────────────────────────────────────── */
 
 function useSample(el) {
-  // Always switch to the text tab when a sample is clicked
   switchTab('text', document.querySelectorAll('.tab')[0]);
   document.getElementById('news-input').value = el.textContent.trim();
   clearResult();
 }
 
 
-/* ── 4. Input Helpers ─────────────────────────────────────── */
+/* ── 5. Input Helpers ─────────────────────────────────────── */
 
 function getInput() {
   if (activeTab === 'text') {
@@ -76,7 +88,7 @@ function resetButton(btn) {
 }
 
 
-/* ── 5. Main Analysis Flow ────────────────────────────────── */
+/* ── 6. Main Analysis Flow ────────────────────────────────── */
 
 async function runAnalysis() {
   const input = getInput();
@@ -97,93 +109,46 @@ async function runAnalysis() {
 }
 
 
-/* ── 6. API Call ──────────────────────────────────────────── */
+/* ── 7. API Call ──────────────────────────────────────────── */
 /*
-   Once your FastAPI / Flask backend is running, delete the
-   mockPredict() call below and uncomment this real fetch.
+   Calls POST /api/predict on the FastAPI backend.
 
-   Your endpoint should accept:
-     POST /api/predict
-     Body: { "text": "..." }   or   { "ticker": "AAPL" }
-
-   And return:
+   The backend returns:
      {
        "sentiment":  "bullish" | "bearish" | "neutral",
-       "score":      0.87,          // top-class probability
-       "confidence": 0.91,          // model confidence
+       "score":      0.87,
+       "confidence": 0.91,
        "breakdown":  { "bullish": 0.87, "neutral": 0.09, "bearish": 0.04 },
-       "summary":    "Optional explanation string."
+       "summary":    "HTML string"
      }
 */
 
 async function fetchPrediction(input) {
-
-  // ── MOCK (remove after connecting API) ──
-  await new Promise(resolve => setTimeout(resolve, 1400));
-  return mockPredict(input);
-  // ── END MOCK ────────────────────────────
-
-  /*
   const payload = activeTab === 'text'
     ? { text: input }
-    : { ticker: input };
+    : { ticker: input.toUpperCase() };
 
-  const response = await fetch('/api/predict', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(payload)
+  const response = await fetch(`${BACKEND_URL}/api/predict`, {
+    method  : 'POST',
+    headers : { 'Content-Type': 'application/json' },
+    body    : JSON.stringify(payload),
   });
 
   if (!response.ok) {
-    const err = await response.json().catch(() => ({}));
-    throw new Error(err.detail || `Server error ${response.status}`);
+    let detail = `Server error ${response.status}`;
+    try {
+      const err = await response.json();
+      // FastAPI validation errors come as { detail: [...] }
+      if (Array.isArray(err.detail)) {
+        detail = err.detail.map(e => e.msg).join(', ');
+      } else if (typeof err.detail === 'string') {
+        detail = err.detail;
+      }
+    } catch (_) { /* ignore JSON parse errors */ }
+    throw new Error(detail);
   }
 
   return response.json();
-  */
-}
-
-
-/* ── 7. Mock Predictor (remove after API is connected) ───── */
-
-function mockPredict(input) {
-  const text = input.toLowerCase();
-
-  const bullishWords = ['beat', 'record', 'growth', 'strong', 'rally', 'surge', 'profit', 'gain', 'cuts'];
-  const bearishWords = ['decline', 'fall', 'loss', 'crisis', 'default', 'uncertainty', 'risk', 'recession'];
-
-  const bScore = bullishWords.filter(w => text.includes(w)).length;
-  const rScore = bearishWords.filter(w => text.includes(w)).length;
-
-  let sentiment, score, breakdown;
-
-  if (bScore > rScore) {
-    sentiment = 'bullish';
-    score     = 0.72 + Math.random() * 0.2;
-    breakdown = { bullish: score, neutral: (1 - score) * 0.6, bearish: (1 - score) * 0.4 };
-  } else if (rScore > bScore) {
-    sentiment = 'bearish';
-    score     = 0.65 + Math.random() * 0.22;
-    breakdown = { bearish: score, neutral: (1 - score) * 0.55, bullish: (1 - score) * 0.45 };
-  } else {
-    sentiment = 'neutral';
-    score     = 0.48 + Math.random() * 0.14;
-    breakdown = { neutral: score, bullish: (1 - score) * 0.52, bearish: (1 - score) * 0.48 };
-  }
-
-  const summaries = {
-    bullish: 'The model detects <span>positive market signals</span> in this input. Key indicators suggest optimism around near-term price movement.',
-    bearish: 'The model identifies <span>negative market pressure</span>. Indicators point toward caution or downside risk in the short term.',
-    neutral: 'The model finds <span>mixed or inconclusive signals</span>. Market direction appears uncertain based on available indicators.'
-  };
-
-  return {
-    sentiment,
-    score,
-    breakdown,
-    summary:    summaries[sentiment],
-    confidence: 0.84 + Math.random() * 0.12
-  };
 }
 
 
