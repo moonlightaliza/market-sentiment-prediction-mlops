@@ -1,0 +1,7 @@
+data/
+venv/
+notebooks/
+src/
+mlops/
+docker/
+*.dvc
