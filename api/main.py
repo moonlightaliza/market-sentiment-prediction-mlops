@@ -337,16 +337,14 @@ def _fetch_ticker_sentiment(ticker: str) -> dict:
     # ── Price momentum signal ──────────────────────────────────
     hist = tk.history(period="5d", interval="15m")
     if hist.empty:
-        raise HTTPException(
-            status_code=422,
-            detail=f"No price data found for ticker '{ticker}'. "
-                   "Check the symbol and try again."
-        )
-    # Simple momentum: last close vs 5-period-ago close
-    closes     = hist["Close"].dropna().values
-    momentum   = (closes[-1] - closes[-min(5, len(closes))]) / closes[-min(5, len(closes))]
-    price_score = float(np.tanh(momentum * 20))   # squash into (-1, 1)
-    log.info(f"[{ticker}] price momentum score: {price_score:.3f}")
+        log.warning(f"[{ticker}] no price data from yfinance, using news-only mode")
+        price_score = 0.0
+    else:
+        # Simple momentum: last close vs 5-period-ago close
+        closes     = hist["Close"].dropna().values
+        momentum   = (closes[-1] - closes[-min(5, len(closes))]) / closes[-min(5, len(closes))]
+        price_score = float(np.tanh(momentum * 20))   # squash into (-1, 1)
+        log.info(f"[{ticker}] price momentum score: {price_score:.3f}")
 
     # ── News / earnings headline sentiment ────────────────────
     text_scores: List[float] = []
